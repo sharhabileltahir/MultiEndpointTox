@@ -1,0 +1,133 @@
+project:
+  name: "MultiEndpointTox"
+  version: "0.2.0"
+  author: "Sharhabil"
+  description: "Integrated ML Prediction of Multiple Toxicity Endpoints"
+
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  external_data: "data/external"
+  interim_data: "data/interim"
+  models: "models"
+  reports: "reports"
+  figures: "reports/figures"
+
+data_curation:
+  chembl_version: "34"
+  herg:
+    target_chembl_id: "CHEMBL240"
+    activity_types: ["IC50", "Ki", "Kd"]
+    min_pchembl: 4.0
+    standard_units: "nM"
+    organism: "Homo sapiens"
+    confidence_score_min: 8
+    expected_compounds: 10000
+  hepatotox:
+    target_keywords: ["hepatotoxicity", "DILI", "liver toxicity"]
+    sources: ["ChEMBL", "DILIrank", "LiverTox"]
+    expected_compounds: 8000
+  nephrotox:
+    target_keywords: ["nephrotoxicity", "kidney toxicity", "renal toxicity"]
+    sources: ["ChEMBL", "literature"]
+    expected_compounds: 5000
+  ames:
+    target_keywords: ["ames", "mutagenicity", "bacterial reverse mutation", "salmonella"]
+    sources: ["ChEMBL", "literature"]
+    expected_compounds: 5000
+    task_type: "classification"
+  skin_sens:
+    target_keywords: ["skin sensitization", "LLNA", "local lymph node", "contact dermatitis"]
+    sources: ["ChEMBL", "literature"]
+    expected_compounds: 3000
+    task_type: "classification"
+  cytotox:
+    target_keywords: ["cytotoxicity", "cell viability", "MTT assay", "cell death"]
+    sources: ["ChEMBL", "literature"]
+    expected_compounds: 5000
+    task_type: "classification"
+
+features:
+  rdkit_descriptors: true
+  morgan_fingerprints:
+    radius: 2
+    n_bits: 2048
+  maccs_keys: true
+  physicochemical:
+    - "MolWt"
+    - "LogP"
+    - "TPSA"
+    - "HBA"
+    - "HBD"
+    - "RotatableBonds"
+    - "AromaticRings"
+    - "NumHeavyAtoms"
+  feature_selection:
+    method: "variance_and_correlation"
+    variance_threshold: 0.01
+    correlation_threshold: 0.95
+    max_features: 500
+
+modeling:
+  random_state: 42
+  test_size: 0.2
+  val_size: 0.1
+  algorithms:
+    random_forest:
+      n_estimators: [100, 300, 500]
+      max_depth: [10, 20, 30, null]
+      min_samples_split: [2, 5, 10]
+    xgboost:
+      n_estimators: [100, 300, 500]
+      max_depth: [3, 6, 9]
+      learning_rate: [0.01, 0.05, 0.1]
+      subsample: [0.7, 0.8, 0.9]
+    svm:
+      C: [0.1, 1, 10, 100]
+      kernel: ["rbf", "linear"]
+      gamma: ["scale", "auto"]
+    lightgbm:
+      n_estimators: [100, 300, 500]
+      max_depth: [3, 6, 9]
+      learning_rate: [0.01, 0.05, 0.1]
+  hyperparameter_tuning:
+    method: "optuna"
+    n_trials: 30
+    cv_folds: 3
+
+validation:
+  cross_validation:
+    method: "stratified_kfold"
+    n_splits: 5
+    n_repeats: 3
+  metrics:
+    regression: ["r2", "rmse", "mae", "q2"]
+    classification: ["accuracy", "sensitivity", "specificity", "auc", "mcc"]
+  applicability_domain:
+    method: "leverage"
+    threshold: 3.0
+
+targets:
+  herg:
+    r2: 0.85
+    rmse: 0.60
+  hepatotox:
+    r2: 0.80
+    sensitivity: 0.85
+  nephrotox:
+    r2: 0.70
+  ames:
+    accuracy: 0.80
+    sensitivity: 0.80
+    specificity: 0.80
+  skin_sens:
+    accuracy: 0.75
+    sensitivity: 0.75
+  cytotox:
+    accuracy: 0.80
+    sensitivity: 0.80
+
+logging:
+  level: "INFO"
+  log_file: "reports/pipeline.log"
+  console: true

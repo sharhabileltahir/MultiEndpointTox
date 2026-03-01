@@ -1,0 +1,76 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Setup: Create Virtual Environment",
+            "type": "shell",
+            "command": "python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt",
+            "group": "build",
+            "presentation": {"reveal": "always", "panel": "new"}
+        },
+        {
+            "label": "Setup: Install Dependencies",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/pip install -r requirements.txt",
+            "group": "build",
+            "presentation": {"reveal": "always"}
+        },
+        {
+            "label": "Verify Installation",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -c \"import rdkit, sklearn, xgboost, pandas, numpy; print('All packages OK')\"",
+            "group": "test",
+            "presentation": {"reveal": "always"}
+        },
+        {
+            "label": "Phase 1: hERG Data Curation",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python src/main.py --endpoint herg --phase data_curation",
+            "group": "build",
+            "options": {"cwd": "${workspaceFolder}"},
+            "presentation": {"reveal": "always", "panel": "new"}
+        },
+        {
+            "label": "Phase 2: hERG Feature Engineering",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python src/main.py --endpoint herg --phase feature_engineering",
+            "group": "build",
+            "options": {"cwd": "${workspaceFolder}"}
+        },
+        {
+            "label": "Phase 3: hERG Model Training",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python src/main.py --endpoint herg --phase modeling",
+            "group": "build",
+            "options": {"cwd": "${workspaceFolder}"}
+        },
+        {
+            "label": "Phase 4: hERG Validation",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python src/main.py --endpoint herg --phase validation",
+            "group": "build",
+            "options": {"cwd": "${workspaceFolder}"}
+        },
+        {
+            "label": "Run Full hERG Pipeline",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python src/main.py --endpoint herg --phase all",
+            "group": {"kind": "build", "isDefault": true},
+            "options": {"cwd": "${workspaceFolder}"},
+            "presentation": {"reveal": "always", "panel": "new"}
+        },
+        {
+            "label": "Lint Code",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -m black src/ tests/ && ${workspaceFolder}/.venv/bin/python -m isort src/ tests/",
+            "group": "build"
+        },
+        {
+            "label": "Run All Tests",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -m pytest tests/ -v --tb=short",
+            "group": {"kind": "test", "isDefault": true},
+            "presentation": {"reveal": "always"}
+        }
+    ]
+}

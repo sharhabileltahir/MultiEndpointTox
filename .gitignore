@@ -1,0 +1,21 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+data/raw/**/*.csv
+data/processed/**/*.csv
+data/interim/**/*.csv
+!data/**/.gitkeep
+# Keep model files for release (comment out to exclude large files)
+# models/**/*.pkl
+# models/**/*.joblib
+.ipynb_checkpoints/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*.log
+.env
