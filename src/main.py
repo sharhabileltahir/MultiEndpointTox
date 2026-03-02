@@ -67,6 +67,12 @@ def run_data_curation(config, endpoint):
         fetcher = CytotoxFetcher(config)
         raw_data = fetcher.fetch()
         logger.success(f"Fetched {len(raw_data)} compounds for cytotoxicity")
+    elif endpoint == "reproductive_tox":
+        logger.info("Step 1/3: Fetching reproductive toxicity dataset...")
+        from src.data_curation.reproductive_tox_fetcher import ReproductiveToxFetcher
+        fetcher = ReproductiveToxFetcher(config)
+        raw_data = fetcher.fetch()
+        logger.success(f"Fetched {len(raw_data)} compounds for reproductive toxicity")
     else:
         logger.info("Step 1/3: Fetching bioactivity data from ChEMBL...")
         fetcher = ChEMBLFetcher(config)
@@ -223,7 +229,7 @@ Examples:
     )
     parser.add_argument(
         "--endpoint",
-        choices=["herg", "hepatotox", "nephrotox", "ames", "skin_sens", "cytotox"],
+        choices=["herg", "hepatotox", "nephrotox", "ames", "skin_sens", "cytotox", "reproductive_tox"],
         help="Toxicity endpoint to process",
     )
     parser.add_argument(

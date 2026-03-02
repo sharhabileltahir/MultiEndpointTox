@@ -10,7 +10,7 @@
 
 ## Overview
 
-MultiEndpointTox is a machine learning-powered REST API for predicting multiple drug toxicity endpoints from molecular structures. It provides interpretable predictions with SHAP explanations, structural alerts, and integrated risk assessment.
+MultiEndpointTox is a machine learning-powered REST API for predicting multiple drug toxicity endpoints from molecular structures. It provides interpretable predictions with SHAP explanations, structural alerts, molecular docking, 3D descriptors, and integrated risk assessment.
 
 ### Toxicity Endpoints
 
@@ -22,15 +22,20 @@ MultiEndpointTox is a machine learning-powered REST API for predicting multiple 
 | **Ames** | Classification | Ames mutagenicity test | XGBoost |
 | **Skin Sens** | Classification | Skin sensitization potential | RandomForest |
 | **Cytotox** | Classification | General cytotoxicity | XGBoost |
+| **Reproductive Tox** | Classification | Reproductive/developmental toxicity | LightGBM |
 
 ### Key Features
 
 - **Multi-endpoint prediction** - Assess all toxicity risks in a single API call
 - **SHAP interpretability** - Understand which molecular features drive predictions
 - **Structural alerts** - Detection of known toxic substructures
+- **Molecular docking** - AutoDock Vina integration for binding affinity prediction
+- **3D descriptors** - Shape, surface, and volume calculations
+- **Pharmacophore analysis** - Feature extraction and similarity comparison
 - **Applicability domain** - Confidence assessment for each prediction
 - **Integrated risk assessment** - Overall risk score and critical endpoint identification
 - **Batch processing** - Predict up to 1000 compounds at once
+- **PDF reports** - Comprehensive toxicity assessment reports
 
 ---
 
@@ -165,6 +170,27 @@ Once the server is running:
 | GET | `/interpret/{endpoint}?smiles=...` | SHAP interpretation via GET |
 | GET | `/shap/status` | SHAP explainer status |
 
+#### Molecular Docking
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/docking/status` | Check docking availability |
+| GET | `/docking/targets` | List available protein targets |
+| POST | `/dock` | Dock compound against target |
+| GET | `/dock/{target}?smiles=...` | Dock via GET |
+| POST | `/dock/batch` | Batch docking |
+| POST | `/dock/enhanced` | Enhanced docking with 3D descriptors |
+| POST | `/predict/ensemble` | ML + docking ensemble prediction |
+
+#### 3D Descriptors & Pharmacophores
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/descriptors/3d` | Calculate 3D molecular descriptors |
+| GET | `/descriptors/3d?smiles=...` | 3D descriptors via GET |
+| POST | `/pharmacophore/features` | Extract pharmacophore features |
+| POST | `/pharmacophore/compare` | Compare two compounds |
+
 #### Utilities
 
 | Method | Endpoint | Description |
@@ -275,6 +301,239 @@ Once the server is running:
 }
 ```
 
+#### Molecular Docking
+
+**Request:**
+```json
+{
+  "smiles": "CC(=O)Nc1ccc(O)cc1",
+  "target": "herg",
+  "exhaustiveness": 8
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "smiles": "CC(=O)Nc1ccc(O)cc1",
+  "protein_id": "herg",
+  "affinity": -6.4,
+  "normalized_score": 0.32,
+  "num_poses": 9,
+  "interpretation": {
+    "risk_level": "moderate",
+    "description": "Moderate binding affinity"
+  }
+}
+```
+
+#### Enhanced Docking with 3D Descriptors
+
+**Request:**
+```json
+{
+  "smiles": "CC(=O)Nc1ccc(O)cc1",
+  "target": "herg"
+}
+```
+
+**Response:**
+```json
+{
+  "docking": {
+    "success": true,
+    "affinity": -6.4,
+    "normalized_score": 0.32
+  },
+  "descriptors_3d": {
+    "shape_descriptors": {
+      "asphericity": 0.6534,
+      "eccentricity": 0.9911,
+      "radius_of_gyration": 2.65
+    },
+    "volume_descriptors": {
+      "molecular_volume": 140.02
+    },
+    "pharmacophore_counts": {
+      "h_bond_acceptors": 2,
+      "h_bond_donors": 2,
+      "aromatic_rings": 1,
+      "hydrophobic_centers": 6
+    }
+  },
+  "binding_compatibility": {
+    "shape_compatibility": "good",
+    "size_compatibility": "good",
+    "pharmacophore_match": "high",
+    "binding_risk": "moderate"
+  },
+  "enhanced_score": {
+    "score": 0.3795,
+    "risk_level": "moderate",
+    "shape_modifier": 1.1,
+    "pharmacophore_modifier": 1.15
+  }
+}
+```
+
+#### Pharmacophore Comparison
+
+**Request:**
+```json
+{
+  "smiles1": "CC(=O)Nc1ccc(O)cc1",
+  "smiles2": "CC(=O)OC1=CC=CC=C1C(=O)O"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "pharmacophore_similarity": 0.087,
+  "feature_comparison": {
+    "h_bond_acceptors": [2, 4],
+    "h_bond_donors": [2, 1],
+    "aromatic_rings": [1, 1],
+    "hydrophobic_centers": [6, 7]
+  },
+  "shape_comparison": {
+    "asphericity": [0.653, 0.197],
+    "molecular_volume": [140.0, 156.9]
+  }
+}
+```
+
+---
+
+## Molecular Docking
+
+MultiEndpointTox integrates AutoDock Vina for physics-based binding affinity prediction.
+
+### Setup
+
+1. **Install AutoDock Vina:**
+   - Download from https://vina.scripps.edu/downloads/
+   - Add to system PATH
+
+2. **Enable docking in config:**
+   ```yaml
+   docking:
+     enabled: true
+     engine: "vina"
+   ```
+
+### Available Protein Targets
+
+| Target | PDB ID | Description | Endpoints |
+|--------|--------|-------------|-----------|
+| hERG | 5VA1 | hERG potassium channel | herg |
+| CYP3A4 | 1TQN | Cytochrome P450 3A4 | hepatotox |
+| CYP2D6 | 4WNT | Cytochrome P450 2D6 | hepatotox |
+| CYP2C9 | 1OG5 | Cytochrome P450 2C9 | hepatotox |
+| AR | 2AM9 | Androgen receptor | reproductive_tox |
+| ER-alpha | 1ERE | Estrogen receptor alpha | reproductive_tox |
+
+### Docking Examples
+
+```bash
+# Single compound docking
+curl -X POST "http://127.0.0.1:8000/dock" \
+  -H "Content-Type: application/json" \
+  -d '{"smiles": "CC(=O)Nc1ccc(O)cc1", "target": "herg"}'
+
+# Enhanced docking with 3D descriptors
+curl -X POST "http://127.0.0.1:8000/dock/enhanced" \
+  -H "Content-Type: application/json" \
+  -d '{"smiles": "CC(=O)Nc1ccc(O)cc1", "target": "herg"}'
+
+# Ensemble prediction (ML + docking)
+curl -X POST "http://127.0.0.1:8000/predict/ensemble" \
+  -H "Content-Type: application/json" \
+  -d '{"smiles": "CC(=O)Nc1ccc(O)cc1", "endpoint": "herg", "include_docking": true}'
+```
+
+### Batch Docking Script
+
+```bash
+# Dock compound library against multiple targets
+python scripts/batch_docking.py \
+  --input compounds.csv \
+  --targets herg,hepatotox,cyp2d6 \
+  --output results/docking_results.csv
+```
+
+---
+
+## 3D Descriptors & Pharmacophores
+
+Calculate 3D molecular properties and pharmacophore features for binding analysis.
+
+### 3D Descriptor Categories
+
+| Category | Descriptors |
+|----------|-------------|
+| **Shape** | Asphericity, eccentricity, PMI ratios, spherocity |
+| **Surface** | TPSA, SASA (solvent accessible surface area) |
+| **Volume** | Molecular volume |
+| **Pharmacophore** | HBA, HBD, aromatic, hydrophobic, ionizable |
+
+### Python Usage
+
+```python
+from src.docking import Descriptors3DCalculator, DockingManager
+
+# Calculate 3D descriptors
+calc = Descriptors3DCalculator()
+result = calc.calculate_all("CC(=O)Nc1ccc(O)cc1")
+
+print(f"Asphericity: {result.asphericity:.3f}")
+print(f"Volume: {result.molecular_volume:.1f} Å³")
+print(f"H-Bond Acceptors: {result.n_hba}")
+print(f"Aromatic Rings: {result.n_aromatic}")
+
+# Compare pharmacophores
+dm = DockingManager(config=config)
+comparison = dm.compare_pharmacophores(
+    "CC(=O)Nc1ccc(O)cc1",  # Acetaminophen
+    "CC(=O)OC1=CC=CC=C1C(=O)O"  # Aspirin
+)
+print(f"Similarity: {comparison['pharmacophore_similarity']:.3f}")
+```
+
+---
+
+## PDF Report Generation
+
+Generate comprehensive toxicity assessment reports.
+
+```bash
+# Single compound report
+python scripts/generate_report.py \
+  --smiles "CC(=O)Nc1ccc(O)cc1" \
+  --name "Acetaminophen" \
+  --include-docking \
+  --output reports/acetaminophen_report.pdf
+
+# Multi-compound report from CSV
+python scripts/generate_report.py \
+  --input compounds.csv \
+  --include-docking \
+  --output reports/toxicity_report.pdf
+```
+
+### Report Contents
+
+- **Compound Summary**: Structure image, properties, SMILES
+- **Risk Assessment**: Overall risk score and gauge visualization
+- **Endpoint Predictions**: Color-coded toxicity predictions
+- **Docking Results**: Binding affinities and enhanced scores
+- **3D Descriptors**: Shape and pharmacophore analysis
+- **Binding Compatibility**: Target-specific compatibility analysis
+- **Structural Alerts**: Detected toxicophores
+- **Methodology**: Model and analysis descriptions
+
 ---
 
 ## Project Structure
@@ -286,6 +545,7 @@ MultiEndpointTox/
 ├── data/
 │   ├── raw/                  # Original datasets
 │   ├── processed/            # Cleaned data
+│   ├── structures/           # Protein PDB/PDBQT files
 │   └── external/             # External validation sets
 ├── models/                   # Trained ML models
 │   ├── herg/
@@ -293,14 +553,24 @@ MultiEndpointTox/
 │   ├── nephrotox/
 │   ├── ames/
 │   ├── skin_sens/
-│   └── cytotox/
-├── reports/                  # Validation reports
+│   ├── cytotox/
+│   └── reproductive_tox/
+├── reports/                  # Generated PDF reports
+├── scripts/
+│   ├── batch_docking.py     # Batch docking workflow
+│   ├── generate_report.py   # PDF report generator
+│   └── test_3d_descriptors.py
 ├── src/
 │   ├── api/
 │   │   ├── app.py           # FastAPI application
 │   │   ├── predictor.py     # Prediction logic
 │   │   └── explainer.py     # SHAP explanations
 │   ├── data_curation/       # Data collection & cleaning
+│   ├── docking/             # Molecular docking module
+│   │   ├── docking_engine.py    # Vina/Smina interface
+│   │   ├── docking_manager.py   # High-level docking API
+│   │   ├── structure_manager.py # Protein preparation
+│   │   └── descriptors_3d.py    # 3D descriptors & pharmacophores
 │   ├── feature_engineering/ # Molecular descriptors
 │   ├── modeling/            # ML training
 │   ├── validation/          # Model validation
@@ -343,6 +613,7 @@ pytest tests/test_api.py -v
 | Ames | AUC-ROC | 0.85 | 6,512 |
 | Skin Sens | AUC-ROC | 0.79 | 1,100 |
 | Cytotox | AUC-ROC | 0.81 | 8,371 |
+| Reproductive Tox | Accuracy | 0.75 | 117 |
 
 ---
 
@@ -408,7 +679,9 @@ Research Assistant | Computational Pharmaceutical Chemistry
 
 ## Acknowledgments
 
-- RDKit for cheminformatics
+- RDKit for cheminformatics and 3D conformer generation
 - SHAP for model interpretability
 - FastAPI for the web framework
 - scikit-learn, XGBoost, LightGBM for ML models
+- AutoDock Vina for molecular docking
+- ReportLab for PDF generation

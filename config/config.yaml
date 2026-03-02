@@ -46,6 +46,11 @@ data_curation:
     sources: ["ChEMBL", "literature"]
     expected_compounds: 5000
     task_type: "classification"
+  reproductive_tox:
+    target_keywords: ["reproductive toxicity", "developmental toxicity", "teratogenicity", "fertility", "fetal toxicity", "embryotoxicity"]
+    sources: ["ChEMBL", "literature", "FDA"]
+    expected_compounds: 3000
+    task_type: "classification"
 
 features:
   rdkit_descriptors: true
@@ -126,6 +131,90 @@ targets:
   cytotox:
     accuracy: 0.80
     sensitivity: 0.80
+  reproductive_tox:
+    accuracy: 0.75
+    sensitivity: 0.80
+    specificity: 0.75
+
+docking:
+  enabled: true
+  engine: "vina"  # vina, smina
+  structures_dir: "data/structures"
+
+  # Docking parameters
+  docking_params:
+    exhaustiveness: 8
+    n_poses: 9
+    seed: 42
+
+  # Protein targets for each endpoint
+  protein_structures:
+    herg:
+      name: "hERG Potassium Channel"
+      pdb_id: "5VA1"
+      center: [92.8, 57.6, 52.2]
+      box_size: [40, 40, 40]
+      chain: "A"
+      description: "hERG potassium channel - cardiotoxicity"
+
+    hepatotox:
+      name: "CYP3A4"
+      pdb_id: "1TQN"
+      center: [-19.3, -23.8, -14.1]
+      box_size: [30, 30, 30]
+      chain: "A"
+      description: "Cytochrome P450 3A4 - major drug metabolizing enzyme"
+
+    cyp2d6:
+      name: "CYP2D6"
+      pdb_id: "4WNT"
+      center: [7.7, 27.3, -71.9]
+      box_size: [30, 30, 30]
+      chain: "A"
+      description: "Cytochrome P450 2D6 - polymorphic drug metabolism"
+
+    cyp2c9:
+      name: "CYP2C9"
+      pdb_id: "1OG5"
+      center: [-20.9, 78.3, 30.3]
+      box_size: [30, 30, 30]
+      chain: "A"
+      description: "Cytochrome P450 2C9 - warfarin metabolism"
+
+    er_alpha:
+      name: "Estrogen Receptor Alpha"
+      pdb_id: "1ERE"
+      center: [13.5, 56.2, 127.9]
+      box_size: [25, 25, 25]
+      chain: "A"
+      description: "ER-alpha - endocrine disruption, reproductive toxicity"
+
+    ar:
+      name: "Androgen Receptor"
+      pdb_id: "2AM9"
+      center: [20.5, 5.3, 11.3]
+      box_size: [25, 25, 25]
+      chain: "A"
+      description: "Androgen receptor - reproductive/endocrine toxicity"
+
+    reproductive_tox:
+      name: "Estrogen Receptor Alpha"
+      pdb_id: "1ERE"
+      center: [13.5, 56.2, 127.9]
+      box_size: [25, 25, 25]
+      chain: "A"
+      description: "ER-alpha - reproductive toxicity"
+
+  # Ensemble prediction weights
+  ensemble:
+    ml_weight: 0.7
+    docking_weight: 0.3
+
+  # Risk thresholds based on binding affinity (kcal/mol)
+  affinity_thresholds:
+    high_risk: -8.0      # Strong binder
+    moderate_risk: -6.0  # Moderate binder
+    low_risk: -4.0       # Weak binder
 
 logging:
   level: "INFO"

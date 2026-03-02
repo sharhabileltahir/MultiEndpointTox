@@ -41,6 +41,9 @@ class ToxicityPredictor:
     - Ames mutagenicity - Classification
     - Skin sensitization - Classification
     - Cytotoxicity - Classification
+    - Reproductive toxicity - Classification
+
+    Optional: Molecular docking integration for enhanced predictions.
     """
 
     ENDPOINTS = {
@@ -50,9 +53,13 @@ class ToxicityPredictor:
         "ames": {"task": "classification", "description": "Ames mutagenicity"},
         "skin_sens": {"task": "classification", "description": "Skin sensitization"},
         "cytotox": {"task": "classification", "description": "Cytotoxicity"},
+        "reproductive_tox": {"task": "classification", "description": "Reproductive/developmental toxicity"},
     }
 
-    def __init__(self, models_dir: str = "models"):
+    # Endpoints that support docking integration
+    DOCKING_SUPPORTED = ["herg", "hepatotox", "reproductive_tox"]
+
+    def __init__(self, models_dir: str = "models", docking_manager=None):
         self.models_dir = Path(models_dir)
         self.loaded_models: Dict[str, Dict] = {}
         self._load_available_models()
@@ -65,6 +72,9 @@ class ToxicityPredictor:
                 logger.info("SHAP explainer initialized")
             except Exception as e:
                 logger.warning(f"Could not initialize SHAP explainer: {e}")
+
+        # Optional docking integration
+        self.docking_manager = docking_manager
 
     def _load_available_models(self):
         """Load all available trained models."""
@@ -373,6 +383,8 @@ class ToxicityPredictor:
                     label = "Sensitizer" if prediction == 1 else "Non-sensitizer"
                 elif endpoint == "cytotox":
                     label = "Cytotoxic" if prediction == 1 else "Non-cytotoxic"
+                elif endpoint == "reproductive_tox":
+                    label = "Reproductive toxicant" if prediction == 1 else "Non-reproductive toxicant"
                 else:
                     label = "Positive" if prediction == 1 else "Negative"
 
