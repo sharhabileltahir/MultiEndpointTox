@@ -5,6 +5,8 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/sharhabileltahir/MultiEndpointTox/actions/workflows/ci.yml/badge.svg)](https://github.com/sharhabileltahir/MultiEndpointTox/actions)
+[![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://github.com/sharhabileltahir/MultiEndpointTox)
 
 ---
 
@@ -582,6 +584,24 @@ MultiEndpointTox/
 
 ---
 
+## Docker Deployment
+
+```bash
+# Build the image
+docker build -t multiendpointtox .
+
+# Run the container
+docker run -p 8000:8000 multiendpointtox
+
+# Run with environment variables
+docker run -p 8000:8000 -e API_KEY=your-key multiendpointtox
+
+# Docker Compose (if docker-compose.yml exists)
+docker-compose up -d
+```
+
+---
+
 ## Testing
 
 ```bash
@@ -597,7 +617,7 @@ pytest tests/test_api.py -v
 
 **Test Coverage:**
 - 56 tests covering API endpoints, predictor functionality, and edge cases
-- Tests for all 6 toxicity endpoints
+- Tests for all 7 toxicity endpoints
 - SHAP interpretation tests
 - Invalid input handling
 
@@ -613,7 +633,9 @@ pytest tests/test_api.py -v
 | Ames | AUC-ROC | 0.85 | 6,512 |
 | Skin Sens | AUC-ROC | 0.79 | 1,100 |
 | Cytotox | AUC-ROC | 0.81 | 8,371 |
-| Reproductive Tox | Accuracy | 0.75 | 117 |
+| Reproductive Tox* | Accuracy | 0.75 | 117 |
+
+> **Note on Reproductive Toxicity:** This endpoint has a limited training dataset (117 compounds). Predictions should be interpreted with caution and validated experimentally. The model uses a curated set of known reproductive toxicants and safe compounds from literature.
 
 ---
 

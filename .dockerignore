@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+.tox
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+*.egg-info/
+dist/
+build/
+
+# Docs
+docs/
+*.md
+!README.md
+
+# Data (raw data not needed in container)
+data/raw/
+data/external/
+data/structures/
+
+# Reports and results
+reports/
+results/
+
+# Development
+*.log
+.env
+.env.*
+scripts/test_*.py
+
+# Large files
+*.xlsx
+*.csv
+!data/processed/*.npz
