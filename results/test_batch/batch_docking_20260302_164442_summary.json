@@ -1,0 +1,38 @@
+{
+  "total_compounds": 8,
+  "targets_screened": [
+    "herg",
+    "hepatotox"
+  ],
+  "num_targets": 2,
+  "statistics": {
+    "herg": {
+      "success_rate": 100.0,
+      "mean_affinity": -7.15,
+      "min_affinity": -9.1,
+      "max_affinity": -5.4,
+      "std_affinity": 1.12583302491977,
+      "strong_binders": 2,
+      "moderate_binders": 5,
+      "weak_binders": 1
+    },
+    "hepatotox": {
+      "success_rate": 100.0,
+      "mean_affinity": -8.0,
+      "min_affinity": -10.2,
+      "max_affinity": -6.1,
+      "std_affinity": 1.2589678312014172,
+      "strong_binders": 4,
+      "moderate_binders": 4,
+      "weak_binders": 0
+    }
+  },
+  "risk_distribution": {
+    "high_risk": 4,
+    "moderate_risk": 4,
+    "low_risk": 0,
+    "no_binding_data": 0
+  },
+  "execution_time_seconds": 126.66837430000305,
+  "timestamp": "20260302_164442"
+}

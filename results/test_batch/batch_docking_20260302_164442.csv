@@ -1,0 +1,9 @@
+name,smiles,best_affinity,best_target,herg_affinity,herg_success,hepatotox_affinity,hepatotox_success
+Acetaminophen,CC(=O)Nc1ccc(O)cc1,-6.8,hepatotox,-6.4,True,-6.8,True
+Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,-7.0,hepatotox,-6.2,True,-7.0,True
+Caffeine,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,-6.1,hepatotox,-5.4,True,-6.1,True
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,-7.7,hepatotox,-7.1,True,-7.7,True
+Terfenadine,CC(C)(C)c1ccc(cc1)C(O)CCCN2CCC(CC2)C(O)(c3ccccc3)c4ccccc4,-9.1,herg,-9.1,True,-8.8,True
+Diclofenac,OC(=O)Cc1ccccc1Nc2c(Cl)cccc2Cl,-8.5,hepatotox,-7.8,True,-8.5,True
+Naproxen,COc1ccc2cc(ccc2c1)C(C)C(=O)O,-8.9,hepatotox,-6.9,True,-8.9,True
+Warfarin,CC(=O)CC(c1ccccc1)c2c(O)c3ccccc3oc2=O,-10.2,hepatotox,-8.3,True,-10.2,True

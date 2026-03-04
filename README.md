@@ -33,6 +33,7 @@ MultiEndpointTox is a machine learning-powered REST API for predicting multiple 
 - **Structural alerts** - Detection of known toxic substructures
 - **Molecular docking** - AutoDock Vina integration for binding affinity prediction
 - **3D descriptors** - Shape, surface, and volume calculations
+- **2D/3D/GNN benchmarking workflows** - Reproducible scripts for classical ML and Chemprop D-MPNN comparison
 - **Pharmacophore analysis** - Feature extraction and similarity comparison
 - **Applicability domain** - Confidence assessment for each prediction
 - **Integrated risk assessment** - Overall risk score and critical endpoint identification
@@ -506,6 +507,86 @@ print(f"Similarity: {comparison['pharmacophore_similarity']:.3f}")
 
 ---
 
+## hERG Benchmark Workflows
+
+This repository includes reproducible, publication-oriented benchmarking pipelines for hERG:
+
+- **3D descriptor matrix generation** from SMILES with ETKDG + UFF optimization
+- **Classical ML comparisons** for 2D vs 3D vs Hybrid features (classification and regression)
+- **Graph Neural Network (D-MPNN)** benchmarking via Chemprop for regression
+
+### 1) Build 3D Descriptor Matrix (ETKDG/UFF)
+
+```bash
+python scripts/build_3d_descriptor_matrix.py \
+  --input-csv data/processed/herg_3d_binary_input.csv \
+  --smiles-col SMILES \
+  --target-col target \
+  --output-dir data/interim/herg_3d_matrix
+```
+
+Outputs:
+- `data/interim/herg_3d_matrix/X_3D.npy`
+- `data/interim/herg_3d_matrix/y.npy`
+
+### 2) Classical 2D/3D/Hybrid Comparison (Classification)
+
+```bash
+python scripts/compare_2d_3d_models.py \
+  --x2d data/interim/herg_2d_matrix/X_2D.npy \
+  --x3d data/interim/herg_3d_matrix/X_3D.npy \
+  --y data/interim/herg_3d_matrix/y.npy \
+  --output-dir results/model_comparison_2d_3d
+```
+
+### 3) Classical 2D/3D/Hybrid Comparison (Regression)
+
+```bash
+python scripts/compare_2d_3d_regression.py \
+  --x2d data/interim/herg_2d_matrix/X_2D.npy \
+  --x3d data/interim/herg_3d_matrix/X_3D.npy \
+  --y data/interim/herg_regression/y.npy \
+  --output-dir results/model_comparison_2d_3d_regression
+```
+
+### 4) Chemprop D-MPNN Workflow (Regression)
+
+```bash
+# Create isolated environment (recommended)
+conda create -n chemprop python=3.11 -y
+conda activate chemprop
+python -m pip install --upgrade pip
+python -m pip install "chemprop==2.2.2"
+
+# Prepare Chemprop input CSV (smiles, pchembl_value)
+python scripts/prepare_chemprop_herg_regression_dataset.py \
+  --input-csv data/processed/herg_curated.csv \
+  --output-csv data/processed/herg_chemprop_regression.csv \
+  --smiles-col std_smiles \
+  --target-col pchembl_value
+
+# Run 80/20 split + 5-fold CV on training + external test
+python scripts/run_chemprop_herg_regression.py \
+  --data-csv data/processed/herg_chemprop_regression.csv \
+  --chemprop-bin chemprop \
+  --smiles-col smiles \
+  --target-col pchembl_value \
+  --test-size 0.2 \
+  --n-splits 5 \
+  --seed 42 \
+  --output-dir results/model_comparison_2d_3d_regression/chemprop_dmpnn
+```
+
+Chemprop outputs:
+- `cv_fold_predictions.csv`
+- `test_set_predictions.csv`
+- `cv_performance_summary.csv`
+- `external_test_performance.csv`
+- `fold_r2_values.json`
+- Fold/final checkpoints under `cv/` and `final_model/`
+
+---
+
 ## PDF Report Generation
 
 Generate comprehensive toxicity assessment reports.
@@ -581,6 +662,14 @@ MultiEndpointTox/
 ├── requirements.txt
 └── README.md
 ```
+
+### Newly Added Benchmark Scripts
+
+- `scripts/build_3d_descriptor_matrix.py`
+- `scripts/compare_2d_3d_models.py`
+- `scripts/compare_2d_3d_regression.py`
+- `scripts/prepare_chemprop_herg_regression_dataset.py`
+- `scripts/run_chemprop_herg_regression.py`
 
 ---
 

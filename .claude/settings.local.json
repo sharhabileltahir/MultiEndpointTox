@@ -50,7 +50,14 @@
       "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
       "Bash(/mnt/c/Users/sharh/OneDrive/Desktop/MultiEndpointTox/.venv/Scripts/python.exe:*)",
       "Bash(/mnt/c/Users/sharh/OneDrive/Desktop/MultiEndpointTox/.venv/bin/python:*)",
-      "Bash(/mnt/c/Users/sharh/miniconda3/python.exe:*)"
+      "Bash(/mnt/c/Users/sharh/miniconda3/python.exe:*)",
+      "Bash(tree:*)",
+      "Bash(pip install meeko)",
+      "Bash(source ~/.bashrc)",
+      "Bash(pip install:*)",
+      "Bash(python scripts/generate_report.py:*)",
+      "Bash(/home/sharh/miniconda3/envs/toxpred/bin/pip install:*)",
+      "Bash(gh repo edit:*)"
     ]
   }
 }
