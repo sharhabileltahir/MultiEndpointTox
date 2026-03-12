@@ -1,32 +1,80 @@
-# MultiEndpointTox
+# Title
 
-## Graphical Abstract
-![Graphical Abstract](path/to/graphical_abstract_placeholder.png)
+MultiEndpoint Toxicology Prediction
 
-## Performance Badges
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-80%25-yellow)
+# Graphical Abstract
 
-## Minimal Quick Example
-```python
-# Example code to demonstrate functionality
+![Graphical Abstract](link_to_graphical_abstract.png)
 
-import MultiEndpointTox
+# Key Features
 
-# quick usage example
-result = MultiEndpointTox.some_function() 
-print(result)
+- Multi-toxicity endpoint prediction
+- Easy integration with various databases
+- User-friendly interface
+
+# Supported Toxicity Endpoints
+
+1. Endpoint 1: Description
+2. Endpoint 2: Description
+3. Endpoint 3: Description
+
+# Installation
+
+```bash
+pip install multi-endpoint-tox
 ```
 
-## Dataset Acknowledgments
-We acknowledge the following datasets for providing essential data for our project:
-- Dataset 1
-- Dataset 2
+# Quick Start
 
-## Roadmap
-- **Q1 2026:** Initial Release
-- **Q2 2026:** Add new features
-- **Q3 2026:** Optimize performance
+1. Import the library:
+   ```python
+   import multi_endpoint_tox
+   ```
+2. Load your data and run predictions.
 
-## License
+# Example Output
+
+```json
+{"prediction": "toxic"}
+```
+
+# Project Architecture
+
+- `src/`: Source code
+- `tests/`: Unit tests
+- `docs/`: Documentation
+
+# Jupyter Notebook Demo
+
+Available in `notebooks/demo.ipynb`
+
+# Citation
+
+Please cite this project as:
+
+```
+@article{Toxicology2026,
+  title={MultiEndpoint Toxicology Prediction},
+  author={Author Name},
+  journal={Journal Name},
+  year={2026},
+}
+```
+
+# Contributing
+
+We welcome contributions! Please refer to `CONTRIBUTING.md` for guidelines.
+
+# License
+
 This project is licensed under the MIT License.
+
+# Dataset Acknowledgments
+
+Special thanks to Dataset Contributors and Data Sources.
+
+# Roadmap
+
+1. Feature A: Description
+2. Feature B: Description
+
